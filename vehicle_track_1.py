@@ -2,6 +2,7 @@ import cv2
 from ultralytics import YOLO
 from collections import defaultdict
 import numpy as np
+import math
 
 # Static Line Drawing
 
@@ -237,7 +238,7 @@ while cap.isOpened():
             # Save the current position of the vehicle to its path
             if track_id is not None:
                 vehicle_paths[track_id].append((cx, cy))
-
+                
                 # Draw the trajectory
                 for i in range(1, len(vehicle_paths[track_id])):
                     if vehicle_paths[track_id][i - 1] and vehicle_paths[track_id][i]:
@@ -280,7 +281,7 @@ while cap.isOpened():
     cv2.imshow("YOLO Object Tracking & Counting", frame)
 
     # Exit on 'q' key press
-    if cv2.waitKey(0) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
