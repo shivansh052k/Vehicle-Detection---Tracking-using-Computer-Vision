@@ -108,6 +108,13 @@ crossed_ids_out = set()
 class_counts_in = defaultdict(int)
 crossed_ids_in = set()
 
+vehicle_paths = defaultdict(list)
+allowed_classes = {1, 2, 3, 5, 7}
+
+vehicle_last_position = {}
+PIXELS_TO_KMH = 0.1
+
+
 frame_skip = 1
 frame_count = 0
 
@@ -179,9 +186,6 @@ def calculate_lane_lines(left_lane, right_lane, frame_width, frame_height):
 
     return (x_left, y_left_in, y_left_out), (x_right, y_right_in, y_right_out)
 
-# Classes to include for counting
-allowed_classes = {1, 2, 3, 5, 7}
-
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -229,6 +233,16 @@ while cap.isOpened():
             cx = (x1 + x2) // 2
             cy = (y1 + y2) // 2
             class_name = class_list[class_idx]
+            
+            # Save the current position of the vehicle to its path
+            if track_id is not None:
+                vehicle_paths[track_id].append((cx, cy))
+
+                # Draw the trajectory
+                for i in range(1, len(vehicle_paths[track_id])):
+                    if vehicle_paths[track_id][i - 1] and vehicle_paths[track_id][i]:
+                        cv2.line(frame, vehicle_paths[track_id][i - 1], vehicle_paths[track_id][i], (0, 255, 255), 2)
+
 
             # Draw bounding box, ID, and class
             cv2.circle(frame, (cx, cy), 1, (0, 0, 255), -1)
@@ -266,7 +280,7 @@ while cap.isOpened():
     cv2.imshow("YOLO Object Tracking & Counting", frame)
 
     # Exit on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(0) & 0xFF == ord('q'):
         break
 
 cap.release()
